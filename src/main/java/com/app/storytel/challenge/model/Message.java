@@ -1,6 +1,7 @@
 package com.app.storytel.challenge.model;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import javax.persistence.AttributeOverride;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -22,9 +23,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @Data
-@AllArgsConstructor
-@Table(name = "nessages")
-@AttributeOverride(name = "id", column = @Column(name = "message_id", nullable = false, columnDefinition = "BIGINT"))
+@Table(name = "messages")
+@AttributeOverride(name = "id", column = @Column(name = "message_id", 
+        nullable = false, columnDefinition = "BIGINT"))
 public class Message extends StorytelModelBase implements Serializable {
 
     @NotNull(message = "Message subject cannot be blank")
@@ -32,11 +33,24 @@ public class Message extends StorytelModelBase implements Serializable {
     @Column(name = "message_subject")
     private String subject;
     @NotNull(message = "Message content cannot be blank")
-    @Column(name = "message_subject")
+    @Column(name = "message_content")
     private String messageContent;
     @Column(name = "view_count", columnDefinition = "int default '0'")
     private Integer views;
     @JoinColumn(name = "login_id", referencedColumnName = "login_id")
     @ManyToOne
     private LoginInformation owner;
+
+    public Message(Long messageId, String subject, String messageContent, 
+            Integer views, LoginInformation owner, LocalDateTime created, 
+            LocalDateTime modified) {
+        this.subject = subject;
+        this.messageContent = messageContent;
+        this.views = views;
+        this.owner = owner;
+        this.setId(messageId);
+        this.setCreated(created);
+        this.setModified(modified);
+    }
+
 }

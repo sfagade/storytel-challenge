@@ -11,13 +11,13 @@ import javax.persistence.Table;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 /**
- *
  * @author samsonfagade
  */
 @Entity
@@ -29,13 +29,11 @@ import lombok.NoArgsConstructor;
 @AttributeOverride(name = "id", column = @Column(name = "login_id", nullable = false, columnDefinition = "BIGINT"))
 public class LoginInformation extends StorytelModelBase implements Serializable {
 
-    @Basic(optional = false)
     @NotNull(message = "Email Address cannot be blank")
-    @Size(max = 25)
-    @Column(name = "email_address")
+    @Size(min = 8, max = 25)
+    @Column(name = "email_address", unique = true)
     @Email(message = "Please provide a valid email address")
     private String emailAddress;
-    @Basic(optional = false)
     @NotNull(message = "Password cannot be blank")
     @Size(min = 6, max = 12)
     @Column(name = "password")

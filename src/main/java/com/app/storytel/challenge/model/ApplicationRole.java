@@ -25,7 +25,6 @@ import lombok.NoArgsConstructor;
 @AttributeOverride(name = "id", column = @Column(name = "app_role_id", nullable = false, columnDefinition = "BIGINT"))
 public class ApplicationRole extends StorytelModelBase implements Serializable {
 
-    @Basic(optional = false)
     @NotNull
     @Size(max = 25)
     @Column(name = "role_name")
