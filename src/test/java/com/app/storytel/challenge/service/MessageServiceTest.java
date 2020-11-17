@@ -3,57 +3,67 @@ package com.app.storytel.challenge.service;
 import com.app.storytel.challenge.model.ApplicationRole;
 import com.app.storytel.challenge.model.LoginInformation;
 import com.app.storytel.challenge.model.Message;
-import com.app.storytel.challenge.payload.request.LoginInformationRequest;
 import com.app.storytel.challenge.payload.request.MessageRequest;
 import com.app.storytel.challenge.respository.ApplicationRoleRepository;
 import com.app.storytel.challenge.respository.LoginInformationRepository;
-
+import com.app.storytel.challenge.respository.MessageRepository;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class MessageServiceTest {
 
     @Autowired
     private LoginInformationRepository loginInformationRepository;
     @Autowired
     private ApplicationRoleRepository applicationRoleRepository;
-
+    @Autowired
+    private MessageRepository messageRepository;
     @Autowired
     private MessageService messageService;
     @Autowired
     private LoginInformationService loginInformationService;
 
-    @BeforeEach
-    void setUp() {
-
+    @BeforeAll
+    void initTestRecords() {
         ApplicationRole applicationRole = new ApplicationRole();
         applicationRole.setRoleName("User");
         applicationRoleRepository.save(applicationRole);
 
-        /** LoginInformation loginInformation = new LoginInformation();
+        LoginInformation loginInformation = new LoginInformation();
         loginInformation.setEmailAddress("user@test.com");
         loginInformation.setPassword("user_password");
         loginInformation.setApplicationRole(applicationRole);
 
-        this.loginInformationRepository.save(loginInformation); */
+        this.loginInformationRepository.save(loginInformation);
+        ArrayList<Message> messages = prepareMessages();
+        messages.stream().map(message -> {
+            message.setOwner(loginInformation);
+            return message;
+        }).forEachOrdered(message -> {
+            this.messageRepository.save(message);
+        });
+    }
+
+    @BeforeEach
+    void setUp() {
+
     }
 
     @Test
     void saveNewMessageTest() {
-        LoginInformationRequest loginInformationRequest = new LoginInformationRequest();
-        loginInformationRequest.setEmailAddress("user@test.com");
-        loginInformationRequest.setPassword("user_password");
-        loginInformationRequest.setRoleId(1L);
-        LoginInformation owner = this.loginInformationService.saveNewLoginInformation(loginInformationRequest);
-        //LoginInformation owner = this.loginInformationService.findLoginInformation(1L);
+        LoginInformation owner = this.loginInformationService.findLoginInformation(1L);
         assertNotNull(owner, "Message owner empty");
 
         MessageRequest messageRequest = new MessageRequest();
@@ -71,7 +81,7 @@ class MessageServiceTest {
         messageRequest.setMessageContent("This is a very long content");
         messageRequest.setSubject("Subject of the message");
         messageRequest.setViews(20);
-        long messageId = 1;
+        Long messageId = 2L;
 
         boolean updatedRecord = this.messageService.updateMessage(messageId, messageRequest);
         assertTrue(updatedRecord, "update message test failed");
@@ -79,14 +89,14 @@ class MessageServiceTest {
 
     @Test
     void findMessageTest() {
-        Long messageId = 1L;
+        Long messageId = 3L;
         Message message = this.messageService.findMessage(messageId);
         assertNotNull(message, "Finding message from");
     }
 
     @Test
     void fetchMessagesTest() {
-        List<Message> messageList = this.messageService.fetchMessages(1, 5, "subject");
+        List<Message> messageList = this.messageService.fetchMessages(0, 5, "subject");
         assertNotNull(messageList, "Message list is empty");
         assertTrue(messageList.size() > 0, "Result set is less than zero");
     }
@@ -96,5 +106,17 @@ class MessageServiceTest {
         Long messageId = 1L;
         boolean deletedRecord = this.messageService.deleteMessage(messageId);
         assertTrue(deletedRecord, "Deleting message failed");
+    }
+
+    private ArrayList<Message> prepareMessages() {
+        ArrayList<Message> messages = new ArrayList<>();
+        for (int x = 0; x < 5; x++) {
+            Message message = new Message();
+            message.setMessageContent("This is a very long content " + x);
+            message.setSubject("Subject of the message " + x);
+            messages.add(message);
+        }
+
+        return messages;
     }
 }

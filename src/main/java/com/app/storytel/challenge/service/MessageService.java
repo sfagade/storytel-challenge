@@ -54,7 +54,7 @@ public class MessageService {
                 Message existingMessage = optionalMessage.get();
                 existingMessage.setSubject(messageRequest.getSubject());
                 existingMessage.setMessageContent(messageRequest.getMessageContent());
-                if (existingMessage.getViews() < messageRequest.getViews()) {
+                if (existingMessage.getViews() != null && existingMessage.getViews() < messageRequest.getViews()) {
                     existingMessage.setViews(messageRequest.getViews());
                 }
 
