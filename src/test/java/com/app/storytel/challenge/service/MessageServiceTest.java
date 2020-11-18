@@ -17,8 +17,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -48,12 +47,9 @@ class MessageServiceTest {
 
         this.loginInformationRepository.save(loginInformation);
         ArrayList<Message> messages = prepareMessages();
-        messages.stream().map(message -> {
-            message.setOwner(loginInformation);
-            return message;
-        }).forEachOrdered(message -> {
-            this.messageRepository.save(message);
-        });
+        messages.stream().peek(
+                message -> message.setOwner(loginInformation)).
+                forEachOrdered(message -> this.messageRepository.save(message));
     }
 
     @BeforeEach
@@ -71,8 +67,12 @@ class MessageServiceTest {
         messageRequest.setSubject("Subject of the message");
 
         Message testMessage = this.messageService.saveNewMessage(messageRequest, owner);
-        assertNotNull(testMessage, "Save message test failed with nul");
-        assertNotNull(testMessage.getId(), "Save message test failed with no ID");
+
+        assertAll(
+                "Save Message Test",
+                () -> assertNotNull(testMessage, "Save message test failed with nul"),
+                () -> assertNotNull(testMessage.getId(), "Save message test failed with no ID"));
+
     }
 
     @Test
@@ -97,8 +97,10 @@ class MessageServiceTest {
     @Test
     void fetchMessagesTest() {
         List<Message> messageList = this.messageService.fetchMessages(0, 5, "subject");
-        assertNotNull(messageList, "Message list is empty");
-        assertTrue(messageList.size() > 0, "Result set is less than zero");
+        assertAll(
+                "Save Message Test",
+                () -> assertNotNull(messageList, "Message list is empty"),
+                () -> assertTrue(messageList.size() > 0, "Result set is less than zero"));
     }
 
     @Test
@@ -112,8 +114,8 @@ class MessageServiceTest {
         ArrayList<Message> messages = new ArrayList<>();
         for (int x = 0; x < 5; x++) {
             Message message = new Message();
-            message.setMessageContent("This is a very long content " + x);
-            message.setSubject("Subject of the message " + x);
+            message.setMessageContent(String.format("This is a very long content %d", x));
+            message.setSubject(String.format("Subject of the message %d", x));
             messages.add(message);
         }
 
