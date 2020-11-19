@@ -4,6 +4,7 @@ import com.app.storytel.challenge.model.LoginInformation;
 import com.app.storytel.challenge.model.Message;
 import com.app.storytel.challenge.payload.request.MessageRequest;
 import com.app.storytel.challenge.payload.response.MessageResponse;
+import com.app.storytel.challenge.service.LoginInformationService;
 import com.app.storytel.challenge.service.MessageService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -20,14 +22,16 @@ import java.util.stream.Collectors;
 public class MessagesResource {
 
     private final MessageService messageService;
+    private final LoginInformationService loginInformationService;
 
     @Autowired
-    private MessagesResource(MessageService messageService) {
+    private MessagesResource(MessageService messageService, LoginInformationService loginInformationService) {
         this.messageService = messageService;
+        this.loginInformationService = loginInformationService;
     }
 
     @GetMapping
-    public ResponseEntity<List<MessageResponse>> fetchMessages(@RequestParam(value = "page", defaultValue = "1") int page,
+    public ResponseEntity<List<MessageResponse>> fetchMessages(@RequestParam(value = "page", defaultValue = "0") int page,
                                                                @RequestParam(value = "limit", defaultValue = "30") int limit,
                                                                @RequestParam(value = "order", defaultValue = "id") String order) {
         log.info("Call made to fetchMessages method");
@@ -65,9 +69,10 @@ public class MessagesResource {
     }
 
     @PostMapping
-    public ResponseEntity<MessageResponse> createNewMessage(@RequestBody MessageRequest messageRequest) {
+    public ResponseEntity<MessageResponse> createNewMessage(@Valid @RequestBody MessageRequest messageRequest) {
         log.info("Call made to saveNewMessage method");
-        Message message = this.messageService.saveNewMessage(messageRequest, new LoginInformation());
+        LoginInformation owner = this.loginInformationService.findLoginInformation(1L); //TODO I should change this to pick value from jwt token
+        Message message = this.messageService.saveNewMessage(messageRequest, owner);
 
         if (message != null) {
             MessageResponse messageResponse = new MessageResponse(message.getId(), message.getSubject(),
@@ -82,18 +87,24 @@ public class MessagesResource {
     }
 
     @PutMapping
-    public ResponseEntity<MessageResponse> updateExistingMessage(@RequestBody MessageRequest messageRequest) {
+    public ResponseEntity<MessageResponse> updateExistingMessage(@Valid @RequestBody MessageRequest messageRequest) {
         log.info("Call made to updateExistingMessage method");
 
-        if (this.messageService.updateMessage(messageRequest)) {
-            log.info("Call to updateExistingMessage was successful");
-            Message updatedMessage = this.messageService.findMessage(messageRequest.getId());
-            MessageResponse messageResponse = new MessageResponse(updatedMessage.getId(), updatedMessage.getSubject(),
-                    updatedMessage.getMessageContent(), updatedMessage.getViews(), updatedMessage.getCreated(),
-                    updatedMessage.getModified());
-            return new ResponseEntity<>(messageResponse, HttpStatus.OK);
+        if (messageRequest.getViews() != null) {
+            if (this.messageService.updateMessage(messageRequest)) {
+                log.info("Call to updateExistingMessage was successful");
+                Message updatedMessage = this.messageService.findMessage(messageRequest.getId());
+                MessageResponse messageResponse = new MessageResponse(updatedMessage.getId(), updatedMessage.getSubject(),
+                        updatedMessage.getMessageContent(), updatedMessage.getViews(), updatedMessage.getCreated(),
+                        updatedMessage.getModified());
+                return new ResponseEntity<>(messageResponse, HttpStatus.OK);
+            } else {
+                log.info("Failed to update message with record: {}", messageRequest);
+            }
         } else {
-            log.info("Failed to update message with record: {}", messageRequest);
+            /** alternatively I could create a new request object for updates and make views required on that object,
+             * given enough time that would be the preferred implementation */
+            log.error("views not set on request");
         }
 
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

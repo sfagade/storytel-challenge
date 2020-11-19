@@ -1,19 +1,14 @@
 package com.app.storytel.challenge.model;
 
-import java.io.Serializable;
-import java.time.LocalDateTime;
-import javax.persistence.AttributeOverride;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+import java.io.Serializable;
+import java.time.LocalDateTime;
 
 /**
  *
@@ -33,7 +28,8 @@ public class Message extends StorytelModelBase implements Serializable {
     @Column(name = "message_subject")
     private String subject;
     @NotNull(message = "Message content cannot be blank")
-    @Column(name = "message_content")
+    @Column(name = "message_content", length = 1000)
+    @Size(max = 1000, message = "Message content should not be longer than 1000 characters")
     private String messageContent;
     @Column(name = "view_count", columnDefinition = "int default '0'")
     private Integer views;
