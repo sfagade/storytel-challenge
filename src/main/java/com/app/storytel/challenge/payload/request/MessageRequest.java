@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 @Data
 public class MessageRequest {
 
+    private Long id;
     @NotNull(message = "Message subject cannot be blank")
     @Size(max = 150, message = "Message subject should not be longer than 150 characters")
     private String subject;

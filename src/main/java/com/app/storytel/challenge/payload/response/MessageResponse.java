@@ -19,4 +19,14 @@ public class MessageResponse {
     private Integer views;
     private LocalDateTime created;
     private LocalDateTime modified;
+
+    public MessageResponse(Long id, String subject, String messageContent, Integer views,
+                           LocalDateTime created, LocalDateTime modified) {
+        this.id = id;
+        this.subject = subject;
+        this.messageContent = messageContent;
+        this.views = views;
+        this.created = created;
+        this.modified = modified;
+    }
 }

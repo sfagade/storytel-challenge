@@ -1,4 +1,4 @@
-package com.app.storytel.challenge.service;
+package com.app.storytel.challenge.service.impl;
 
 import com.app.storytel.challenge.model.ApplicationRole;
 import com.app.storytel.challenge.model.LoginInformation;
@@ -14,10 +14,10 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @SpringBootTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class LoginInformationServiceTest {
+class LoginInformationImplTest {
 
     @Autowired
-    private LoginInformationService loginInformationService;
+    private LoginInformationImpl loginInformationImpl;
     @Autowired
     private ApplicationRoleRepository applicationRoleRepository;
 
@@ -38,7 +38,7 @@ class LoginInformationServiceTest {
         loginInformationRequest.setRoleId(1L);
 
         LoginInformation loginInformation =
-                this.loginInformationService.saveNewLoginInformation(loginInformationRequest);
+                this.loginInformationImpl.saveNewLoginInformation(loginInformationRequest);
         assertNotNull(loginInformation, "Failed to save Login-Information");
         assertNotNull(loginInformation.getId(),"Login-Information returned without ID");
 

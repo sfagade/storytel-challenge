@@ -1,4 +1,4 @@
-package com.app.storytel.challenge.service;
+package com.app.storytel.challenge.service.impl;
 
 import com.app.storytel.challenge.model.ApplicationRole;
 import com.app.storytel.challenge.model.LoginInformation;
@@ -30,9 +30,9 @@ class MessageServiceTest {
     @Autowired
     private MessageRepository messageRepository;
     @Autowired
-    private MessageService messageService;
+    private MessageImpl messageService;
     @Autowired
-    private LoginInformationService loginInformationService;
+    private LoginInformationImpl loginInformationImpl;
 
     @BeforeAll
     void initTestRecords() {
@@ -59,7 +59,7 @@ class MessageServiceTest {
 
     @Test
     void saveNewMessageTest() {
-        LoginInformation owner = this.loginInformationService.findLoginInformation(1L);
+        LoginInformation owner = this.loginInformationImpl.findLoginInformation(1L);
         assertNotNull(owner, "Message owner empty");
 
         MessageRequest messageRequest = new MessageRequest();
@@ -81,9 +81,9 @@ class MessageServiceTest {
         messageRequest.setMessageContent("This is a very long content");
         messageRequest.setSubject("Subject of the message");
         messageRequest.setViews(20);
-        Long messageId = 2L;
+        messageRequest.setId(2L);
 
-        boolean updatedRecord = this.messageService.updateMessage(messageId, messageRequest);
+        boolean updatedRecord = this.messageService.updateMessage(messageRequest);
         assertTrue(updatedRecord, "update message test failed");
     }
 
