@@ -16,7 +16,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
  *
  * @author samsonfagade
  */
-@ControllerAdvice
+//@ControllerAdvice
 @Slf4j
 public class AppExceptionHandler extends ResponseEntityExceptionHandler {
 

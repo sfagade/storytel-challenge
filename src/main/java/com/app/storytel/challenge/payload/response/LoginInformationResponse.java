@@ -16,4 +16,12 @@ public class LoginInformationResponse {
     private String emailAddress;
     private LocalDateTime created;
     private LocalDateTime modified;
+
+    public LoginInformationResponse(Long id, String emailAddress, LocalDateTime created, LocalDateTime modified) {
+        this.id = id;
+        this.emailAddress = emailAddress;
+        this.created = created;
+        this.modified = modified;
+    }
+
 }

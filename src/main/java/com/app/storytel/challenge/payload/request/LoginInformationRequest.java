@@ -3,6 +3,7 @@ package com.app.storytel.challenge.payload.request;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.persistence.Basic;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -17,6 +18,7 @@ public class LoginInformationRequest {
     private String emailAddress;
     @NotNull(message = "Password cannot be blank")
     @Size(min = 6, max = 12)
+    @Basic(optional = false)
     private String password;
     @NotNull(message = "User role cannot be blank")
     private Long roleId;

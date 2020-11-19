@@ -25,6 +25,7 @@ public class LoginInformationImpl implements LoginInformationService {
         this.applicationRoleRepository = applicationRoleRepository;
     }
 
+    @Override
     public LoginInformation saveNewLoginInformation(LoginInformationRequest loginInformationRequest) {
 
         if (loginInformationRequest != null && loginInformationRequest.getRoleId() != null) {
@@ -53,6 +54,7 @@ public class LoginInformationImpl implements LoginInformationService {
         return null;
     }
 
+    @Override
     public LoginInformation findLoginInformation(Long loginId) {
 
         if (loginId != null) {
