@@ -1,6 +1,7 @@
 package com.app.storytel.challenge.model;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import javax.persistence.AttributeOverride;
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -43,5 +44,12 @@ public class LoginInformation extends StorytelModelBase implements Serializable 
     @ManyToOne
     private ApplicationRole applicationRole;
     
-    
+    public LoginInformation(Long loginId, String emailAddress, String password, ApplicationRole applicationRole, LocalDateTime created, LocalDateTime modified) {
+        this.setId(loginId);
+        this.setEmailAddress(emailAddress);
+        this.setPassword(password);
+        this.setApplicationRole(applicationRole);
+        this.setCreated(created);
+        this.setModified(modified);
+    }
 }

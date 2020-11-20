@@ -1,14 +1,13 @@
 package com.app.storytel.challenge.model;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import javax.persistence.AttributeOverride;
-import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -31,4 +30,12 @@ public class ApplicationRole extends StorytelModelBase implements Serializable {
     private String roleName;
     @Column(name = "role_description")
     private String roleDescription;
+    
+    public ApplicationRole(Long roleId, String roleName, String description, LocalDateTime created, LocalDateTime modified) {
+        this.setId(roleId);
+        this.setRoleName(roleName);
+        this.setRoleDescription(roleDescription);
+        this.setCreated(created);
+        this.setModified(modified);
+    }
 }

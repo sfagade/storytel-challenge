@@ -34,22 +34,28 @@ class MessageServiceTest {
     @Autowired
     private LoginInformationImpl loginInformationImpl;
 
+    private LoginInformation loginInformation;
+
     @BeforeAll
     void initTestRecords() {
         ApplicationRole applicationRole = new ApplicationRole();
         applicationRole.setRoleName("User");
         applicationRoleRepository.save(applicationRole);
 
-        LoginInformation loginInformation = new LoginInformation();
-        loginInformation.setEmailAddress("user@test.com");
-        loginInformation.setPassword("user_password");
-        loginInformation.setApplicationRole(applicationRole);
+        this.loginInformation = this.loginInformationRepository.findOneByEmailAddress("admin@yahoo.com");
 
-        this.loginInformationRepository.save(loginInformation);
-        ArrayList<Message> messages = prepareMessages();
-        messages.stream().peek(
-                message -> message.setOwner(loginInformation)).
-                forEachOrdered(message -> this.messageRepository.save(message));
+        /**
+         * this.loginInformation = new LoginInformation();
+         * this.loginInformation.setEmailAddress("user@test.com");
+         * this.loginInformation.setPassword("user_password");
+         * this.loginInformation.setApplicationRole(applicationRole);
+         *
+         * //this.loginInformationRepository.save(this.loginInformation);
+         * ArrayList<Message> messages = prepareMessages();
+         * messages.stream().peek( message ->
+         * message.setOwner(this.loginInformation)). forEachOrdered(message ->
+         * this.messageRepository.save(message));
+         */
     }
 
     @BeforeEach
@@ -81,9 +87,9 @@ class MessageServiceTest {
         messageRequest.setMessageContent("This is a very long content");
         messageRequest.setSubject("Subject of the message");
         messageRequest.setViews(20);
-        messageRequest.setId(2L);
+        messageRequest.setId(4L);
 
-        boolean updatedRecord = this.messageService.updateMessage(messageRequest, null);
+        boolean updatedRecord = this.messageService.updateMessage(messageRequest, this.loginInformation);
         assertTrue(updatedRecord, "update message test failed");
     }
 
@@ -105,8 +111,8 @@ class MessageServiceTest {
 
     @Test
     void deleteMessageTest() {
-        Long messageId = 1L;
-        boolean deletedRecord = this.messageService.deleteMessage(messageId, null);
+        Long messageId = 5L;
+        boolean deletedRecord = this.messageService.deleteMessage(messageId, this.loginInformation);
         assertTrue(deletedRecord, "Deleting message failed");
     }
 
