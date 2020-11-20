@@ -1,5 +1,6 @@
 package com.app.storytel.challenge.service.impl;
 
+import com.app.storytel.challenge.component.LoginInformationComponent;
 import com.app.storytel.challenge.model.LoginInformation;
 import com.app.storytel.challenge.model.Message;
 import com.app.storytel.challenge.payload.request.MessageRequest;
@@ -25,10 +26,12 @@ import java.util.Optional;
 public class MessageImpl implements MessageService {
 
     private final MessageRepository messageRepository;
+    private final LoginInformationComponent loginInformationComponent;
 
     @Autowired
-    public MessageImpl(MessageRepository messageRepository) {
+    public MessageImpl(MessageRepository messageRepository, LoginInformationComponent loginInformationComponent) {
         this.messageRepository = messageRepository;
+        this.loginInformationComponent = loginInformationComponent;
     }
 
     public Message saveNewMessage(MessageRequest messageRequest, LoginInformation owner) {
@@ -47,22 +50,27 @@ public class MessageImpl implements MessageService {
         return null;
     }
 
-    public Boolean updateMessage(MessageRequest messageRequest) {
+    public Boolean updateMessage(MessageRequest messageRequest, LoginInformation loggedInUser) {
 
         if (messageRequest != null) {
             Optional<Message> optionalMessage = messageRepository.findById(messageRequest.getId());
+
             if (optionalMessage.isPresent()) {
                 Message existingMessage = optionalMessage.get();
-                existingMessage.setSubject(messageRequest.getSubject());
-                existingMessage.setMessageContent(messageRequest.getMessageContent());
-                if (existingMessage.getViews() != null && existingMessage.getViews() < messageRequest.getViews()) {
-                    existingMessage.setViews(messageRequest.getViews());
+
+                if (existingMessage.getOwner().getId().equals(loggedInUser.getId())) {
+                    existingMessage.setSubject(messageRequest.getSubject());
+                    existingMessage.setMessageContent(messageRequest.getMessageContent());
+                    if (existingMessage.getViews() != null && existingMessage.getViews() < messageRequest.getViews()) {
+                        existingMessage.setViews(messageRequest.getViews());
+                    }
+
+                    this.messageRepository.save(existingMessage);
+                    log.info("Message updated successfully {}", existingMessage.getId());
+                    return true;
+                } else {
+                    log.info("{} tried to edit other user's message", loggedInUser.getId());
                 }
-
-                this.messageRepository.save(existingMessage);
-                log.info("Message updated successfully {}", existingMessage.getId());
-                return true;
-
             } else {
                 log.info("Message not in record");
             }
@@ -73,12 +81,12 @@ public class MessageImpl implements MessageService {
         return false;
     }
 
-    public Boolean deleteMessage(Long message_id) {
+    public Boolean deleteMessage(Long message_id, LoginInformation loggedInUser) {
 
         if (message_id != null) {
             Message message = this.findMessage(message_id);
 
-            if (message != null) {
+            if (message != null && loggedInUser.getId().equals(message.getOwner().getId())) {
                 this.messageRepository.delete(message);
                 log.info("Message deleted successfully");
                 return true;

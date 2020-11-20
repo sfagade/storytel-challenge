@@ -83,7 +83,7 @@ class MessageServiceTest {
         messageRequest.setViews(20);
         messageRequest.setId(2L);
 
-        boolean updatedRecord = this.messageService.updateMessage(messageRequest);
+        boolean updatedRecord = this.messageService.updateMessage(messageRequest, null);
         assertTrue(updatedRecord, "update message test failed");
     }
 
@@ -106,7 +106,7 @@ class MessageServiceTest {
     @Test
     void deleteMessageTest() {
         Long messageId = 1L;
-        boolean deletedRecord = this.messageService.deleteMessage(messageId);
+        boolean deletedRecord = this.messageService.deleteMessage(messageId, null);
         assertTrue(deletedRecord, "Deleting message failed");
     }
 

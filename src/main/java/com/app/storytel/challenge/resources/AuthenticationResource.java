@@ -51,7 +51,8 @@ public class AuthenticationResource {
      * user making the request
      */
     @RequestMapping(value = "/signIn", method = RequestMethod.POST)
-    public ResponseEntity<String> authenticateUser(@Valid @RequestBody LoginInformationRequest loginInformationRequest) {
+    public ResponseEntity<String> authenticateUser(
+            @Valid @RequestBody LoginInformationRequest loginInformationRequest) {
 
         log.info("Called sign-in with {}", loginInformationRequest);
 
@@ -74,15 +75,19 @@ public class AuthenticationResource {
     }
 
     @RequestMapping(value = "/register", method = RequestMethod.POST)
-    public ResponseEntity<LoginInformationResponse> registerUser(@Valid @RequestBody LoginInformationRequest loginInformationRequest) {
+    public ResponseEntity<LoginInformationResponse> registerUser(
+            @Valid @RequestBody LoginInformationRequest loginInformationRequest) {
         log.info("Registering new app user: {}", loginInformationRequest);
 
         loginInformationRequest.setPassword(this.passwordEncoder.encode(loginInformationRequest.getPassword()));
-        LoginInformation loginInformation = this.loginInformationService.saveNewLoginInformation(loginInformationRequest);
+        LoginInformation loginInformation =
+                this.loginInformationService.saveNewLoginInformation(loginInformationRequest);
 
         if (loginInformation != null) {
             log.info("Created new login information successfully");
-            return new ResponseEntity<>(new LoginInformationResponse(loginInformation.getId(), loginInformation.getEmailAddress(), loginInformation.getCreated(), loginInformation.getModified()), HttpStatus.OK);
+            return new ResponseEntity<>(new LoginInformationResponse(loginInformation.getId(),
+                    loginInformation.getEmailAddress(), loginInformation.getCreated(),
+                    loginInformation.getModified()), HttpStatus.OK);
         } else {
             log.info("Failed to save new login information");
         }

@@ -2,7 +2,9 @@ package com.app.storytel.challenge.auth;
 
 import com.app.storytel.challenge.model.LoginInformation;
 import com.app.storytel.challenge.respository.LoginInformationRepository;
+
 import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -10,7 +12,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 /**
- *
  * @author samsonfagade
  */
 @Service
@@ -24,7 +25,6 @@ public class CustomUserDetailsService implements UserDetailsService {
     }
 
     @Override
-   
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         // Let people login with either username or email
         LoginInformation loginInformation = loginInformationRepository.findOneByEmailAddress(username);
@@ -36,7 +36,6 @@ public class CustomUserDetailsService implements UserDetailsService {
         return UserPrincipal.create(loginInformation);
     }
 
-    
     public UserDetails loadUserById(Long id) {
         Optional<LoginInformation> optionalLoginInfo = loginInformationRepository.findById(id);
         LoginInformation loginInfo;
