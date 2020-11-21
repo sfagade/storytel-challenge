@@ -20,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -39,7 +40,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 //@ExtendWith(SpringExtension.class)
 @SpringBootTest
-@WebMvcTest(MessagesResource.class)
+@AutoConfigureMockMvc
 public class MessagesResourceTest {
 
     @MockBean
@@ -56,7 +57,7 @@ public class MessagesResourceTest {
         System.out.println("fetchMessages");
         int page = 0;
         int limit = 4;
-        String order = "";
+        String order = "id";
 
         List<Message> messageList = new ArrayList<>();
         ApplicationRole applicationRole = new ApplicationRole(1L, "POWER USER", null, LocalDateTime.MAX, LocalDateTime.MAX);
