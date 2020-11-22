@@ -5,7 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 
 @SpringBootApplication
-@EntityScan("com.app.storytel.challenge")
+@EntityScan("com.app.storytel.challenge.model")
 public class StorytelMessagesApplication {
 
     public static void main(String[] args) {

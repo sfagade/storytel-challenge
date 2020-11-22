@@ -4,6 +4,7 @@ import com.app.storytel.challenge.auth.JwtTokenProvider;
 import com.app.storytel.challenge.auth.UserPrincipal;
 import com.app.storytel.challenge.model.LoginInformation;
 import com.app.storytel.challenge.payload.request.LoginInformationRequest;
+import com.app.storytel.challenge.payload.request.SignInRequest;
 import com.app.storytel.challenge.payload.response.JwtAuthenticationResponse;
 import com.app.storytel.challenge.payload.response.LoginInformationResponse;
 import com.app.storytel.challenge.service.LoginInformationService;
@@ -46,20 +47,20 @@ public class AuthenticationResource {
     /**
      * This method is used to user authentication
      *
-     * @param loginInformationRequest - login json object
+     * @param signInRequest - login json object
      * @return - ResponseEntity containing operation outcome and meta data of
      * user making the request
      */
     @RequestMapping(value = "/signIn", method = RequestMethod.POST)
     public ResponseEntity<String> authenticateUser(
-            @Valid @RequestBody LoginInformationRequest loginInformationRequest) {
+            @Valid @RequestBody SignInRequest signInRequest) {
 
-        log.info("Called sign-in with {}", loginInformationRequest);
+        log.info("Called sign-in with {}", signInRequest);
 
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        loginInformationRequest.getEmailAddress(),
-                        loginInformationRequest.getPassword()
+                        signInRequest.getEmailAddress(),
+                        signInRequest.getPassword()
                 )
         );
 
