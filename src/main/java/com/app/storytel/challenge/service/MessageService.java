@@ -8,8 +8,8 @@ import java.util.List;
 
 public interface MessageService {
     Message saveNewMessage(MessageRequest messageRequest, LoginInformation owner);
-    Boolean updateMessage(MessageRequest messageRequest);
-    Boolean deleteMessage(Long message_id);
+    Boolean updateMessage(MessageRequest messageRequest, LoginInformation loggedInUser);
+    Boolean deleteMessage(Long message_id, LoginInformation loggedInUser);
     List<Message> fetchMessages(Integer pageNo, Integer pageSize, String sortBy);
     Message findMessage(Long message_id);
 

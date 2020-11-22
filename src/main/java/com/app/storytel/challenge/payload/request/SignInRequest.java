@@ -16,7 +16,7 @@ import javax.validation.constraints.Size;
  */
 @NoArgsConstructor
 @Data
-public class LoginInformationRequest {
+public class SignInRequest {
 
     @NotNull(message = "Email Address cannot be blank")
     @Size(min = 8, max = 25)
@@ -26,12 +26,5 @@ public class LoginInformationRequest {
     @Size(min = 6, max = 50)
     @Basic(optional = false)
     private String password;
-    @NotNull(message = "User role cannot be blank")
-    private Long roleId;
 
-    public LoginInformationRequest(String emailAddress, String password, Long roleId) {
-        this.emailAddress = emailAddress;
-        this.password = password;
-        this.roleId = roleId;
-    }
 }

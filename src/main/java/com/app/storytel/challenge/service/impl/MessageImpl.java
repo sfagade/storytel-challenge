@@ -18,6 +18,9 @@ import java.util.List;
 import java.util.Optional;
 
 /**
+ * This class is used to implement all CRUD methods declared in MessageService
+ * interface
+ *
  * @author samsonfagade
  */
 @Service
@@ -31,6 +34,7 @@ public class MessageImpl implements MessageService {
         this.messageRepository = messageRepository;
     }
 
+    @Override
     public Message saveNewMessage(MessageRequest messageRequest, LoginInformation owner) {
 
         if (messageRequest != null && owner != null) {
@@ -47,22 +51,28 @@ public class MessageImpl implements MessageService {
         return null;
     }
 
-    public Boolean updateMessage(MessageRequest messageRequest) {
+    @Override
+    public Boolean updateMessage(MessageRequest messageRequest, LoginInformation loggedInUser) {
 
         if (messageRequest != null) {
             Optional<Message> optionalMessage = messageRepository.findById(messageRequest.getId());
+
             if (optionalMessage.isPresent()) {
                 Message existingMessage = optionalMessage.get();
-                existingMessage.setSubject(messageRequest.getSubject());
-                existingMessage.setMessageContent(messageRequest.getMessageContent());
-                if (existingMessage.getViews() != null && existingMessage.getViews() < messageRequest.getViews()) {
-                    existingMessage.setViews(messageRequest.getViews());
+
+                if (existingMessage.getOwner().getId().equals(loggedInUser.getId())) {
+                    existingMessage.setSubject(messageRequest.getSubject());
+                    existingMessage.setMessageContent(messageRequest.getMessageContent());
+                    if (existingMessage.getViews() != null && existingMessage.getViews() < messageRequest.getViews()) {
+                        existingMessage.setViews(messageRequest.getViews());
+                    }
+
+                    this.messageRepository.save(existingMessage);
+                    log.info("Message updated successfully {}", existingMessage.getId());
+                    return true;
+                } else {
+                    log.info("{} tried to edit other user's message", loggedInUser.getId());
                 }
-
-                this.messageRepository.save(existingMessage);
-                log.info("Message updated successfully {}", existingMessage.getId());
-                return true;
-
             } else {
                 log.info("Message not in record");
             }
@@ -73,12 +83,13 @@ public class MessageImpl implements MessageService {
         return false;
     }
 
-    public Boolean deleteMessage(Long message_id) {
+    @Override
+    public Boolean deleteMessage(Long message_id, LoginInformation loggedInUser) {
 
         if (message_id != null) {
             Message message = this.findMessage(message_id);
 
-            if (message != null) {
+            if (message != null && loggedInUser.getId().equals(message.getOwner().getId())) {
                 this.messageRepository.delete(message);
                 log.info("Message deleted successfully");
                 return true;
@@ -92,6 +103,7 @@ public class MessageImpl implements MessageService {
         return false;
     }
 
+    @Override
     public List<Message> fetchMessages(Integer pageNo, Integer pageSize, String sortBy) {
         Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
         Page<Message> pagedResult = this.messageRepository.findAll(paging);
@@ -105,6 +117,7 @@ public class MessageImpl implements MessageService {
         return null;
     }
 
+    @Override
     public Message findMessage(Long message_id) {
 
         if (message_id != null) {

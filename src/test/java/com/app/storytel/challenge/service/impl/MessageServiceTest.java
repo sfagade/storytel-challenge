@@ -6,7 +6,6 @@ import com.app.storytel.challenge.model.Message;
 import com.app.storytel.challenge.payload.request.MessageRequest;
 import com.app.storytel.challenge.respository.ApplicationRoleRepository;
 import com.app.storytel.challenge.respository.LoginInformationRepository;
-import com.app.storytel.challenge.respository.MessageRepository;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,7 +13,6 @@ import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -28,11 +26,11 @@ class MessageServiceTest {
     @Autowired
     private ApplicationRoleRepository applicationRoleRepository;
     @Autowired
-    private MessageRepository messageRepository;
-    @Autowired
     private MessageImpl messageService;
     @Autowired
     private LoginInformationImpl loginInformationImpl;
+
+    private LoginInformation loginInformation;
 
     @BeforeAll
     void initTestRecords() {
@@ -40,16 +38,8 @@ class MessageServiceTest {
         applicationRole.setRoleName("User");
         applicationRoleRepository.save(applicationRole);
 
-        LoginInformation loginInformation = new LoginInformation();
-        loginInformation.setEmailAddress("user@test.com");
-        loginInformation.setPassword("user_password");
-        loginInformation.setApplicationRole(applicationRole);
+        this.loginInformation = this.loginInformationRepository.findOneByEmailAddress("admin@yahoo.com");
 
-        this.loginInformationRepository.save(loginInformation);
-        ArrayList<Message> messages = prepareMessages();
-        messages.stream().peek(
-                message -> message.setOwner(loginInformation)).
-                forEachOrdered(message -> this.messageRepository.save(message));
     }
 
     @BeforeEach
@@ -81,9 +71,9 @@ class MessageServiceTest {
         messageRequest.setMessageContent("This is a very long content");
         messageRequest.setSubject("Subject of the message");
         messageRequest.setViews(20);
-        messageRequest.setId(2L);
+        messageRequest.setId(4L);
 
-        boolean updatedRecord = this.messageService.updateMessage(messageRequest);
+        boolean updatedRecord = this.messageService.updateMessage(messageRequest, this.loginInformation);
         assertTrue(updatedRecord, "update message test failed");
     }
 
@@ -105,20 +95,8 @@ class MessageServiceTest {
 
     @Test
     void deleteMessageTest() {
-        Long messageId = 1L;
-        boolean deletedRecord = this.messageService.deleteMessage(messageId);
+        Long messageId = 5L;
+        boolean deletedRecord = this.messageService.deleteMessage(messageId, this.loginInformation);
         assertTrue(deletedRecord, "Deleting message failed");
-    }
-
-    private ArrayList<Message> prepareMessages() {
-        ArrayList<Message> messages = new ArrayList<>();
-        for (int x = 0; x < 5; x++) {
-            Message message = new Message();
-            message.setMessageContent(String.format("This is a very long content %d", x));
-            message.setSubject(String.format("Subject of the message %d", x));
-            messages.add(message);
-        }
-
-        return messages;
     }
 }

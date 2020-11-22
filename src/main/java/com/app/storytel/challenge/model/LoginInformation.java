@@ -1,6 +1,7 @@
 package com.app.storytel.challenge.model;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import javax.persistence.AttributeOverride;
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -32,15 +33,24 @@ public class LoginInformation extends StorytelModelBase implements Serializable 
     @Basic(optional = false)
     @NotNull(message = "Email Address cannot be blank")
     @Size(min = 8, max = 25)
-    @Column(name = "email_address", unique = true)
+    @Column(name = "email_address", unique = true, length = 25)
     @Email(message = "Please provide a valid email address")
     private String emailAddress;
     @Basic(optional = false)
     @NotNull(message = "Password cannot be blank")
-    @Size(min = 6, max = 12)
-    @Column(name = "password")
+    @Column(name = "password", length = 100)
     private String password;
     @JoinColumn(name = "app_role_id", referencedColumnName = "app_role_id")
     @ManyToOne
     private ApplicationRole applicationRole;
+
+    public LoginInformation(Long loginId, String emailAddress, String password, ApplicationRole applicationRole,
+            LocalDateTime created, LocalDateTime modified) {
+        this.setId(loginId);
+        this.setEmailAddress(emailAddress);
+        this.setPassword(password);
+        this.setApplicationRole(applicationRole);
+        this.setCreated(created);
+        this.setModified(modified);
+    }
 }

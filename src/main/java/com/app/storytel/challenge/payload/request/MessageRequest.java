@@ -7,6 +7,8 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 /**
+ * Dto class to retrieve data from REST clients, this also provides a convenient
+ * way to provide data validation on the requests
  *
  * @author samsonfagade
  */
@@ -22,4 +24,11 @@ public class MessageRequest {
     @Size(max = 1000, message = "Message content should not be longer than 1000 characters")
     private String messageContent;
     private Integer views;
+
+    public MessageRequest(Long messageId, String subject, String messageContent, Integer views) {
+        this.setId(messageId);
+        this.setSubject(subject);
+        this.setMessageContent(messageContent);
+        this.setViews(views);
+    }
 }

@@ -12,6 +12,10 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
+/**
+ * This class is used to implement all CRUD methods declared in
+ * LoginInformationService interface
+ */
 @Service
 @Slf4j
 public class LoginInformationImpl implements LoginInformationService {
@@ -20,22 +24,25 @@ public class LoginInformationImpl implements LoginInformationService {
     private final ApplicationRoleRepository applicationRoleRepository;
 
     @Autowired
-    public LoginInformationImpl(LoginInformationRepository loginInformationRepository, ApplicationRoleRepository applicationRoleRepository) {
+    public LoginInformationImpl(LoginInformationRepository loginInformationRepository,
+            ApplicationRoleRepository applicationRoleRepository) {
         this.loginInformationRepository = loginInformationRepository;
         this.applicationRoleRepository = applicationRoleRepository;
     }
 
+    @Override
     public LoginInformation saveNewLoginInformation(LoginInformationRequest loginInformationRequest) {
 
         if (loginInformationRequest != null && loginInformationRequest.getRoleId() != null) {
 
-            Optional<ApplicationRole> optionalApplicationRole = this.applicationRoleRepository.findById(loginInformationRequest.getRoleId());
-            if (optionalApplicationRole.isPresent()) {
-                LoginInformation loginInformation = new LoginInformation();
-                loginInformation.setEmailAddress(loginInformationRequest.getEmailAddress());
-                loginInformation.setPassword(loginInformationRequest.getPassword());
-                loginInformation.setApplicationRole(optionalApplicationRole.get());
+            Optional<ApplicationRole> optionalApplicationRole
+                    = this.applicationRoleRepository.findById(loginInformationRequest.getRoleId());
 
+            if (optionalApplicationRole.isPresent()) {
+                LoginInformation loginInformation
+                        = new LoginInformation(null, loginInformationRequest.getEmailAddress(),
+                                loginInformationRequest.getPassword(), optionalApplicationRole.get(),
+                                null, null);
                 loginInformation = this.loginInformationRepository.save(loginInformation);
 
                 if (loginInformation.getId() != null) {
@@ -53,6 +60,7 @@ public class LoginInformationImpl implements LoginInformationService {
         return null;
     }
 
+    @Override
     public LoginInformation findLoginInformation(Long loginId) {
 
         if (loginId != null) {
