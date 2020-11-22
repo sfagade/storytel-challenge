@@ -3,40 +3,58 @@ package com.app.storytel.challenge.resources;
 import com.app.storytel.challenge.model.ApplicationRole;
 import com.app.storytel.challenge.model.LoginInformation;
 import com.app.storytel.challenge.payload.request.LoginInformationRequest;
+import com.app.storytel.challenge.payload.response.LoginInformationResponse;
+import com.app.storytel.challenge.payload.response.MessageResponse;
 import com.app.storytel.challenge.service.LoginInformationService;
 import java.time.LocalDateTime;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-@ExtendWith(MockitoExtension.class)
-@ExtendWith(SpringExtension.class)
+@SpringBootTest
+@AutoConfigureMockMvc
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class AuthenticationResourceTest {
 
-    @MockBean
-    private LoginInformationService loginInformationService;
+    @Autowired
+    private MockMvc mockMvc;
 
     @Test
-    void authenticateUser() {
-    }
+    void registerUser() throws Exception {
 
-    @Test
-    void registerUser() {
+        LoginInformationRequest loginInformationRequest = new LoginInformationRequest("mulan@gmail.com", "mulan-password", 2L);
 
-        LoginInformationRequest loginInformationRequest = new LoginInformationRequest();
-        LoginInformation loginInformation = new LoginInformation();
-        loginInformation.setId(2L);
-        loginInformation.setEmailAddress("test.example@yahoo.com");
-        loginInformation.setPassword("encrypted-password");
-        loginInformation.setApplicationRole(new ApplicationRole());
-        loginInformation.setCreated(LocalDateTime.MAX);
-        loginInformation.setModified(LocalDateTime.MAX);
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.post("/api/authentication/register")
+                .content(String.valueOf(loginInformationRequest))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated()).andReturn();
 
-        Mockito.when(this.loginInformationService.saveNewLoginInformation(loginInformationRequest)).thenReturn(loginInformation);
+        LoginInformationResponse loginInformationResponse = new ObjectMapper().reader()
+                .forType(new TypeReference<MessageResponse>() {})
+                .readValue(result.getResponse().getContentAsString());
+
+        assertAll(
+                "User Create Tests",
+                () -> assertNotNull(loginInformationResponse.getCreated(), "Checked date-time set automatically"),
+                () -> assertNotNull(loginInformationResponse.getRoleName(), "Checked user role set"),
+                () -> assertNotNull(loginInformationResponse.getId(), "Checked new record ID set"));
     }
 }

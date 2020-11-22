@@ -42,7 +42,7 @@ public class MessagesResource {
         if (messageList != null && messageList.size() > 0) {
             List<MessageResponse> messageResponseList = messageList.stream().map(
                     message -> new MessageResponse(message.getId(), message.getSubject(), message.getMessageContent(),
-                            message.getViews(), message.getCreated(), message.getModified())
+                            message.getViews(), message.getOwner().getId(), message.getCreated(), message.getModified())
             ).collect(Collectors.toList());
 
             log.info("Total records matching: {}", messageResponseList.size());
@@ -63,7 +63,8 @@ public class MessagesResource {
 
         if (message != null) {
             MessageResponse messageResponse = new MessageResponse(message.getId(), message.getSubject(),
-                    message.getMessageContent(), message.getViews(), message.getCreated(), message.getModified());
+                    message.getMessageContent(), message.getViews(), message.getOwner().getId(), message.getCreated(),
+                    message.getModified());
             log.info("Call to fetchMessages successful");
             return new ResponseEntity<>(messageResponse, HttpStatus.OK);
         } else {
@@ -82,7 +83,8 @@ public class MessagesResource {
 
         if (message != null) {
             MessageResponse messageResponse = new MessageResponse(message.getId(), message.getSubject(),
-                    message.getMessageContent(), message.getViews(), message.getCreated(), message.getModified());
+                    message.getMessageContent(), message.getViews(), message.getOwner().getId(), message.getCreated(),
+                    message.getModified());
             log.info("Call to saveNewMessage was successful");
             return new ResponseEntity<>(messageResponse, HttpStatus.CREATED);
         } else {
@@ -101,11 +103,12 @@ public class MessagesResource {
         if (messageRequest.getViews() != null) {
             if (this.messageService.updateMessage(messageRequest,
                     loginInformationComponent.fetchLoginUserInformation())) {
+
                 log.info("Call to updateExistingMessage was successful");
                 Message updatedMessage = this.messageService.findMessage(messageRequest.getId());
                 MessageResponse messageResponse = new MessageResponse(updatedMessage.getId(), updatedMessage.getSubject(),
-                        updatedMessage.getMessageContent(), updatedMessage.getViews(), updatedMessage.getCreated(),
-                        updatedMessage.getModified());
+                        updatedMessage.getMessageContent(), updatedMessage.getViews(), updatedMessage.getOwner().getId(),
+                        updatedMessage.getCreated(), updatedMessage.getModified());
                 return new ResponseEntity<>(messageResponse, HttpStatus.OK);
             } else {
                 log.info("Failed to update message with record: {}", messageRequest);

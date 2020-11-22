@@ -14,14 +14,17 @@ public class LoginInformationResponse {
 
     private Long id;
     private String emailAddress;
+    private String roleName;
     private LocalDateTime created;
     private LocalDateTime modified;
 
-    public LoginInformationResponse(Long id, String emailAddress, LocalDateTime created, LocalDateTime modified) {
+    public LoginInformationResponse(Long id, String emailAddress, String roleName, LocalDateTime created,
+                                    LocalDateTime modified) {
         this.id = id;
         this.emailAddress = emailAddress;
         this.created = created;
         this.modified = modified;
+        this.roleName = roleName;
     }
 
 }

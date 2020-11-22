@@ -22,4 +22,10 @@ public class LoginInformationRequest {
     private String password;
     @NotNull(message = "User role cannot be blank")
     private Long roleId;
+
+    public LoginInformationRequest(String emailAddress, String password, Long roleId) {
+        this.emailAddress = emailAddress;
+        this.password = password;
+        this.roleId = roleId;
+    }
 }

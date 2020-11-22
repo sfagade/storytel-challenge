@@ -5,77 +5,194 @@
  */
 package com.app.storytel.challenge.resources;
 
-import com.app.storytel.challenge.model.ApplicationRole;
-import com.app.storytel.challenge.model.LoginInformation;
+import com.app.storytel.challenge.auth.JwtTokenProvider;
 import com.app.storytel.challenge.model.Message;
 import com.app.storytel.challenge.payload.request.MessageRequest;
-import com.app.storytel.challenge.service.MessageService;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import com.app.storytel.challenge.payload.response.JwtAuthenticationResponse;
+import com.app.storytel.challenge.payload.response.MessageResponse;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mockito;
+import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.jsonPath;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultMatcher;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+
+import java.util.ArrayList;
+
+import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
- *
  * @author samsonfagade
  */
 
-//@ExtendWith(SpringExtension.class)
+@Slf4j
 @SpringBootTest
 @AutoConfigureMockMvc
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class MessagesResourceTest {
-
-    @MockBean
-    private MessageService messageService;
 
     @Autowired
     private MockMvc mockMvc;
+    @Autowired
+    private AuthenticationManager authenticationManager;
+    @Autowired
+    private JwtTokenProvider tokenProvider;
+
+    private String accessToken;
+
+    @BeforeAll
+    void initTestAuthentication() {
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        "user@yahoo.com",
+                        "Matthew124"
+                )
+        );
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        String jwt = tokenProvider.generateToken(authentication);
+        this.accessToken = new JwtAuthenticationResponse(jwt).getAccessToken();
+    }
 
     /**
      * Test of fetchMessages method, of class MessagesResource.
      */
     @Test
-    void testFetchMessages() throws Exception {
-        System.out.println("fetchMessages");
+    void testFetchDefaultMessages() throws Exception {
+
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get("/api/messages")
+                .header("Authorization", "Bearer " + this.accessToken)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk()).andReturn();
+
+        ArrayList<Message> criteria = new ObjectMapper().reader()
+                .forType(new TypeReference<ArrayList<Message>>() {})
+                .readValue(result.getResponse().getContentAsString());
+
+        assertTrue(criteria.size() > 1, "Record set greater than one");
+    }
+
+    @Test
+    void testFetchMessagesWithParams() throws Exception {
         int page = 0;
         int limit = 4;
         String order = "id";
+        String paramsUrl = String.format("/api/messages?page=%d&limit=%d&order=%s", page, limit, order);
 
-        List<Message> messageList = new ArrayList<>();
-        ApplicationRole applicationRole = new ApplicationRole(1L, "POWER USER", null, LocalDateTime.MAX, LocalDateTime.MAX);
-        LoginInformation loginInformation = new LoginInformation(1L, "test@example.com", "decent-password", applicationRole, LocalDateTime.MAX, LocalDateTime.MAX);
-
-        messageList.add(new Message(1L, "Message Subject 1", "Message content 1", 4, loginInformation, LocalDateTime.MAX, LocalDateTime.MIN));
-        messageList.add(new Message(2L, "Message Subject 2", "Message content 2", 34, loginInformation, LocalDateTime.MAX, LocalDateTime.MIN));
-        messageList.add(new Message(3L, "Message Subject 3", "Message content 3", 22, loginInformation, LocalDateTime.MAX, LocalDateTime.MIN));
-
-        Mockito.when(messageService.fetchMessages(page, limit, order)).thenReturn(messageList);
-
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/employees")
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get(paramsUrl)
+                .header("Authorization", "Bearer " + this.accessToken)
                 .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect((ResultMatcher) jsonPath("$", hasSize(3)))
-                .andExpect((ResultMatcher) jsonPath("$[1].subject", is("Message content 2")));
+                .andExpect(status().isOk()).andReturn();
+
+        ArrayList<Message> messagesList = new ObjectMapper().reader()
+                .forType(new TypeReference<ArrayList<Message>>() {})
+                .readValue(result.getResponse().getContentAsString());
+
+        assertAll(
+                "Result test",
+                () -> assertTrue(messagesList.size() > 1, "Checked record size greater than one"),
+                () -> assertTrue(messagesList.size() < 5, "Checked right limit count"));
     }
 
+    @Test
+    void testFindMessage() throws Exception {
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get("/api/messages/2")
+                .header("Authorization", "Bearer " + this.accessToken)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk()).andReturn();
 
+        Message message = new ObjectMapper().reader()
+                .forType(new TypeReference<Message>() {})
+                .readValue(result.getResponse().getContentAsString());
+
+        assertEquals(2L, message.getId(), "Checked right record ID");
+    }
+
+    @Test
+    void testCreateNewMessage() throws Exception {
+        MessageRequest messageRequest = new MessageRequest(null, "Message Subject",
+                "Message very long content", 3);
+
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.post("/api/messages")
+                .header("Authorization", "Bearer " + this.accessToken)
+                .content(String.valueOf(messageRequest))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated()).andReturn();
+
+        MessageResponse messageResponse = new ObjectMapper().reader()
+                .forType(new TypeReference<MessageResponse>() {})
+                .readValue(result.getResponse().getContentAsString());
+
+        assertAll(
+                "Message Create Tests",
+                () -> assertNotNull(messageResponse.getCreated(), "Checked date-time set automatically"),
+                () -> assertNotNull(messageResponse.getOwnerId(), "Checked owner set"),
+                () -> assertNotNull(messageResponse.getId(), "Checked new record ID set"));
+    }
+
+    @Test
+    void testUpdateExistingMessage() throws Exception {
+        MessageRequest messageRequest = new MessageRequest(2L, "Message Subject updated",
+                "Message very long content", 3);
+
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.put("/api/messages")
+                .header("Authorization", "Bearer " + this.accessToken)
+                .content(String.valueOf(messageRequest))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk()).andReturn();
+
+        MessageResponse messageResponse = new ObjectMapper().reader()
+                .forType(new TypeReference<MessageResponse>() {})
+                .readValue(result.getResponse().getContentAsString());
+
+        assertAll(
+                "Message Update Tests",
+                () -> assertNotEquals(messageResponse.getCreated(), messageResponse.getModified(),
+                        "Checked created and modified different"),
+                () -> assertEquals(messageResponse.getSubject(), messageRequest.getSubject(),
+                        "Checked subject updated"));
+    }
+
+    @Test
+    void testUpdateDifferentOwnerMessage() throws Exception {
+        MessageRequest messageRequest = new MessageRequest(3L, "Message Subject updated",
+                "Message very long content", 3);
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/api/messages")
+                .header("Authorization", "Bearer " + this.accessToken)
+                .content(String.valueOf(messageRequest))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest()).andReturn();
+    }
+
+    @Test
+    void testDeleteMessage() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/messages/1")
+                .header("Authorization", "Bearer " + this.accessToken)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent()).andReturn();
+
+    }
+
+    @Test
+    void testDifferentOwnerDeleteMessage() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/messages/4")
+                .header("Authorization", "Bearer " + this.accessToken)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest()).andReturn();
+
+    }
 
 }

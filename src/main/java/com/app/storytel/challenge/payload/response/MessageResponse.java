@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 public class MessageResponse {
 
     private Long id;
+    private Long ownerId;
     private String subject;
     private String messageContent;
     private Integer views;
@@ -21,12 +22,13 @@ public class MessageResponse {
     private LocalDateTime modified;
 
     public MessageResponse(Long id, String subject, String messageContent, Integer views,
-                           LocalDateTime created, LocalDateTime modified) {
+                           Long ownerId, LocalDateTime created, LocalDateTime modified) {
         this.id = id;
         this.subject = subject;
         this.messageContent = messageContent;
         this.views = views;
         this.created = created;
         this.modified = modified;
+        this.ownerId = ownerId;
     }
 }

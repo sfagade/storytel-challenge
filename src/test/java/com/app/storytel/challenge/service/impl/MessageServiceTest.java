@@ -44,18 +44,6 @@ class MessageServiceTest {
 
         this.loginInformation = this.loginInformationRepository.findOneByEmailAddress("admin@yahoo.com");
 
-        /**
-         * this.loginInformation = new LoginInformation();
-         * this.loginInformation.setEmailAddress("user@test.com");
-         * this.loginInformation.setPassword("user_password");
-         * this.loginInformation.setApplicationRole(applicationRole);
-         *
-         * //this.loginInformationRepository.save(this.loginInformation);
-         * ArrayList<Message> messages = prepareMessages();
-         * messages.stream().peek( message ->
-         * message.setOwner(this.loginInformation)). forEachOrdered(message ->
-         * this.messageRepository.save(message));
-         */
     }
 
     @BeforeEach

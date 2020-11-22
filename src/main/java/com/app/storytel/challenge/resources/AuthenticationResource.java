@@ -85,13 +85,14 @@ public class AuthenticationResource {
 
         if (loginInformation != null) {
             log.info("Created new login information successfully");
+
             return new ResponseEntity<>(new LoginInformationResponse(loginInformation.getId(),
-                    loginInformation.getEmailAddress(), loginInformation.getCreated(),
-                    loginInformation.getModified()), HttpStatus.OK);
+                    loginInformation.getEmailAddress(), loginInformation.getApplicationRole().getRoleName(),
+                    loginInformation.getCreated(), loginInformation.getModified()), HttpStatus.CREATED);
         } else {
             log.info("Failed to save new login information");
         }
 
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 }

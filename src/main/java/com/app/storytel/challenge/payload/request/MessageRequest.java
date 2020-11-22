@@ -22,4 +22,11 @@ public class MessageRequest {
     @Size(max = 1000, message = "Message content should not be longer than 1000 characters")
     private String messageContent;
     private Integer views;
+
+    public MessageRequest(Long messageId, String subject, String messageContent, Integer views) {
+        this.setId(messageId);
+        this.setSubject(subject);
+        this.setMessageContent(messageContent);
+        this.setViews(views);
+    }
 }
