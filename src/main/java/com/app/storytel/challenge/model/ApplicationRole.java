@@ -1,7 +1,6 @@
 package com.app.storytel.challenge.model;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
 import javax.persistence.AttributeOverride;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -30,12 +29,5 @@ public class ApplicationRole extends StorytelModelBase implements Serializable {
     private String roleName;
     @Column(name = "role_description")
     private String roleDescription;
-    
-    public ApplicationRole(Long roleId, String roleName, String description, LocalDateTime created, LocalDateTime modified) {
-        this.setId(roleId);
-        this.setRoleName(roleName);
-        this.setRoleDescription(roleDescription);
-        this.setCreated(created);
-        this.setModified(modified);
-    }
+
 }

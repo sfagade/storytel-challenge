@@ -1,6 +1,5 @@
 package com.app.storytel.challenge.service.impl;
 
-import com.app.storytel.challenge.component.LoginInformationComponent;
 import com.app.storytel.challenge.model.LoginInformation;
 import com.app.storytel.challenge.model.Message;
 import com.app.storytel.challenge.payload.request.MessageRequest;
@@ -19,6 +18,9 @@ import java.util.List;
 import java.util.Optional;
 
 /**
+ * This class is used to implement all CRUD methods declared in MessageService
+ * interface
+ *
  * @author samsonfagade
  */
 @Service
@@ -26,14 +28,13 @@ import java.util.Optional;
 public class MessageImpl implements MessageService {
 
     private final MessageRepository messageRepository;
-    private final LoginInformationComponent loginInformationComponent;
 
     @Autowired
-    public MessageImpl(MessageRepository messageRepository, LoginInformationComponent loginInformationComponent) {
+    public MessageImpl(MessageRepository messageRepository) {
         this.messageRepository = messageRepository;
-        this.loginInformationComponent = loginInformationComponent;
     }
 
+    @Override
     public Message saveNewMessage(MessageRequest messageRequest, LoginInformation owner) {
 
         if (messageRequest != null && owner != null) {
@@ -50,6 +51,7 @@ public class MessageImpl implements MessageService {
         return null;
     }
 
+    @Override
     public Boolean updateMessage(MessageRequest messageRequest, LoginInformation loggedInUser) {
 
         if (messageRequest != null) {
@@ -81,6 +83,7 @@ public class MessageImpl implements MessageService {
         return false;
     }
 
+    @Override
     public Boolean deleteMessage(Long message_id, LoginInformation loggedInUser) {
 
         if (message_id != null) {
@@ -100,6 +103,7 @@ public class MessageImpl implements MessageService {
         return false;
     }
 
+    @Override
     public List<Message> fetchMessages(Integer pageNo, Integer pageSize, String sortBy) {
         Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
         Page<Message> pagedResult = this.messageRepository.findAll(paging);
@@ -113,6 +117,7 @@ public class MessageImpl implements MessageService {
         return null;
     }
 
+    @Override
     public Message findMessage(Long message_id) {
 
         if (message_id != null) {

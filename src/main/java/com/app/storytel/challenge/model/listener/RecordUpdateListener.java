@@ -6,6 +6,9 @@ import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 
 /**
+ * Model listener class to perform certain functionalities when specific model
+ * events are triggered. I'm listening to pre-update and pre-persist events for
+ * this project
  *
  * @author samsonfagade
  */

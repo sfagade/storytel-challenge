@@ -7,6 +7,8 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 /**
+ * Dto class to retrieve data from REST clients, this also provides a convenient
+ * way to provide data validation on the requests
  *
  * @author samsonfagade
  */

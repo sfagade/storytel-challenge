@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
+ * Custom error message dto class
  *
  * @author samsonfagade
  */

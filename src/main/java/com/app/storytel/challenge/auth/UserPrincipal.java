@@ -35,10 +35,10 @@ public class UserPrincipal implements UserDetails {
         List<GrantedAuthority> authorities = new ArrayList<>();
         authorities.add(new SimpleGrantedAuthority("ROLE_" + loginInformation.getApplicationRole().getRoleName()));
 
-        return new UserPrincipal(loginInformation.getId(), loginInformation.getEmailAddress(), loginInformation.getPassword(), authorities);
+        return new UserPrincipal(loginInformation.getId(), loginInformation.getEmailAddress(),
+                loginInformation.getPassword(), authorities);
     }
 
-    
     public Long getId() {
         return id;
     }

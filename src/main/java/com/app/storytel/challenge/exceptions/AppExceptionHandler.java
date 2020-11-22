@@ -1,22 +1,23 @@
 package com.app.storytel.challenge.exceptions;
 
 import com.app.storytel.challenge.payload.response.ErrorMessage;
-import java.util.Date;
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import java.util.Date;
+
 /**
+ * Custom exception handler class. This would ideally be used to perform domain
+ * specific logic when certain exceptions occur. I've put this in here to
+ * exhibition purposes
  *
  * @author samsonfagade
  */
-//@ControllerAdvice
 @Slf4j
 public class AppExceptionHandler extends ResponseEntityExceptionHandler {
 

@@ -10,6 +10,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
+ * This dto class is used to return login-information object data back to the
+ * REST client. * This provides a safe a friendly way to make sure we're only
+ * sharing data * that the client cares about
  *
  * @author samsonfagade
  */
@@ -28,7 +31,7 @@ public class LoginInformationResponse {
     private LocalDateTime modified;
 
     public LoginInformationResponse(Long id, String emailAddress, String roleName, LocalDateTime created,
-                                    LocalDateTime modified) {
+            LocalDateTime modified) {
         this.id = id;
         this.emailAddress = emailAddress;
         this.created = created;

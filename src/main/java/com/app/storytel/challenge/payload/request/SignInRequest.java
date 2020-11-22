@@ -8,6 +8,12 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+/**
+ * Dto class to retrieve data from REST clients, this also provides a convenient
+ * way to provide data validation on the requests
+ *
+ * @author samsonfagade
+ */
 @NoArgsConstructor
 @Data
 public class SignInRequest {
@@ -21,8 +27,4 @@ public class SignInRequest {
     @Basic(optional = false)
     private String password;
 
-    public SignInRequest(String emailAddress, String password) {
-        this.emailAddress = emailAddress;
-        this.password = password;
-    }
 }

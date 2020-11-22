@@ -1,7 +1,6 @@
 package com.app.storytel.challenge.resources;
 
 import com.app.storytel.challenge.auth.JwtTokenProvider;
-import com.app.storytel.challenge.auth.UserPrincipal;
 import com.app.storytel.challenge.model.LoginInformation;
 import com.app.storytel.challenge.payload.request.LoginInformationRequest;
 import com.app.storytel.challenge.payload.request.SignInRequest;
@@ -25,6 +24,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+/**
+ * Authentication class that serves REST services for new user registration and
+ * sign in functionality. I've included these two here for simplicity and since
+ * there isn't much going on in both methods
+ */
 @Slf4j
 @RestController
 @RequestMapping("/api/authentication")
@@ -37,7 +41,7 @@ public class AuthenticationResource {
 
     @Autowired
     public AuthenticationResource(AuthenticationManager authenticationManager, LoginInformationService loginRepository,
-                                  JwtTokenProvider tokenProvider, PasswordEncoder passwordEncoder) {
+            JwtTokenProvider tokenProvider, PasswordEncoder passwordEncoder) {
         this.authenticationManager = authenticationManager;
         this.loginInformationService = loginRepository;
         this.tokenProvider = tokenProvider;
@@ -64,8 +68,6 @@ public class AuthenticationResource {
                 )
         );
 
-        //login is successful, we need to do business rule validation and save login here
-        UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         String jwt = tokenProvider.generateToken(authentication);
@@ -75,14 +77,20 @@ public class AuthenticationResource {
 
     }
 
+    /**
+     * REST Method to register new user
+     *
+     * @param loginInformationRequest
+     * @return ResponseEntity
+     */
     @RequestMapping(value = "/register", method = RequestMethod.POST)
     public ResponseEntity<LoginInformationResponse> registerUser(
             @Valid @RequestBody LoginInformationRequest loginInformationRequest) {
         log.info("Registering new app user: {}", loginInformationRequest);
 
         loginInformationRequest.setPassword(this.passwordEncoder.encode(loginInformationRequest.getPassword()));
-        LoginInformation loginInformation =
-                this.loginInformationService.saveNewLoginInformation(loginInformationRequest);
+        LoginInformation loginInformation
+                = this.loginInformationService.saveNewLoginInformation(loginInformationRequest);
 
         if (loginInformation != null) {
             log.info("Created new login information successfully");

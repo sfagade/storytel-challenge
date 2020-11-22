@@ -43,8 +43,9 @@ public class LoginInformation extends StorytelModelBase implements Serializable 
     @JoinColumn(name = "app_role_id", referencedColumnName = "app_role_id")
     @ManyToOne
     private ApplicationRole applicationRole;
-    
-    public LoginInformation(Long loginId, String emailAddress, String password, ApplicationRole applicationRole, LocalDateTime created, LocalDateTime modified) {
+
+    public LoginInformation(Long loginId, String emailAddress, String password, ApplicationRole applicationRole,
+            LocalDateTime created, LocalDateTime modified) {
         this.setId(loginId);
         this.setEmailAddress(emailAddress);
         this.setPassword(password);

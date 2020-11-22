@@ -66,60 +66,6 @@ public class MessagesResourceTest {
         this.accessToken = new JwtAuthenticationResponse(jwt).getAccessToken();
     }
 
-    /**
-     * Test of fetchMessages method, of class MessagesResource.
-     */
-    @Test
-    void testFetchDefaultMessages() throws Exception {
-
-        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get("/api/messages")
-                .header("Authorization", "Bearer " + this.accessToken)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk()).andReturn();
-
-        ArrayList<MessageResponse> criteria = new ObjectMapper().reader()
-                .forType(new TypeReference<ArrayList<MessageResponse>>() {})
-                .readValue(result.getResponse().getContentAsString());
-
-        assertTrue(criteria.size() > 1, "Record set greater than one");
-    }
-
-    @Test
-    void testFetchMessagesWithParams() throws Exception {
-        int page = 0;
-        int limit = 4;
-        String order = "id";
-        String paramsUrl = String.format("/api/messages?page=%d&limit=%d&order=%s", page, limit, order);
-
-        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get(paramsUrl)
-                .header("Authorization", "Bearer " + this.accessToken)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk()).andReturn();
-
-        ArrayList<MessageResponse> messagesList = new ObjectMapper().reader()
-                .forType(new TypeReference<ArrayList<MessageResponse>>() {})
-                .readValue(result.getResponse().getContentAsString());
-
-        assertAll(
-                "Result test",
-                () -> assertTrue(messagesList.size() > 1, "Checked record size greater than one"),
-                () -> assertTrue(messagesList.size() < 5, "Checked right limit count"));
-    }
-
-    @Test
-    void testFindMessage() throws Exception {
-        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get("/api/messages/2")
-                .header("Authorization", "Bearer " + this.accessToken)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk()).andReturn();
-
-        MessageResponse message = new ObjectMapper().reader()
-                .forType(new TypeReference<MessageResponse>() {})
-                .readValue(result.getResponse().getContentAsString());
-
-        assertEquals(2L, message.getId(), "Checked right record ID");
-    }
-
     @Test
     void testCreateNewMessage() throws Exception {
         MessageRequest messageRequest = new MessageRequest(null, "Message Subject",

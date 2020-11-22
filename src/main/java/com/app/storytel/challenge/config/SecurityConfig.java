@@ -31,11 +31,15 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 )
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    @Autowired
-    private CustomUserDetailsService customUserDetailsService;
+    private final CustomUserDetailsService customUserDetailsService;
+    private final JwtAuthenticationEntryPoint unauthorizedHandler;
 
     @Autowired
-    private JwtAuthenticationEntryPoint unauthorizedHandler;
+    public SecurityConfig(JwtAuthenticationEntryPoint unauthorizedHandler,
+            CustomUserDetailsService customUserDetailsService) {
+        this.unauthorizedHandler = unauthorizedHandler;
+        this.customUserDetailsService = customUserDetailsService;
+    }
 
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter() {
@@ -45,7 +49,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     public void configure(AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
         authenticationManagerBuilder
-                .userDetailsService(customUserDetailsService)
+                .userDetailsService(this.customUserDetailsService)
                 .passwordEncoder(passwordEncoder());
     }
 
@@ -68,13 +72,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .csrf()
                 .disable()
                 .exceptionHandling()
-                .authenticationEntryPoint(unauthorizedHandler)
+                .authenticationEntryPoint(this.unauthorizedHandler)
                 .and()
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()
-                .antMatchers("/api/authentication/**", "/h2-console/**")
+                .antMatchers("/api/authentication/**", "/h2-console/**", "/api/public/**")
                 .permitAll()
                 .anyRequest()
                 .authenticated();

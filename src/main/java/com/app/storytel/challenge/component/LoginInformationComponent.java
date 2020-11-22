@@ -1,6 +1,5 @@
 package com.app.storytel.challenge.component;
 
-
 import com.app.storytel.challenge.auth.UserPrincipal;
 import com.app.storytel.challenge.model.LoginInformation;
 import com.app.storytel.challenge.service.LoginInformationService;
@@ -17,8 +16,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class LoginInformationComponent {
 
+    private final LoginInformationService loginInformationService;
+
     @Autowired
-    private LoginInformationService loginInformationService;
+    public LoginInformationComponent(LoginInformationService loginInformationService) {
+        this.loginInformationService = loginInformationService;
+    }
 
     /**
      * This method is used to fetch the current user's login info from auth
@@ -30,6 +33,6 @@ public class LoginInformationComponent {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UserPrincipal currentPrincipal = (UserPrincipal) authentication.getPrincipal();
-        return loginInformationService.findLoginInformation(currentPrincipal.getId());
+        return this.loginInformationService.findLoginInformation(currentPrincipal.getId());
     }
 }
