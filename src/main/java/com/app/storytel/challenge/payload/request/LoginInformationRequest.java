@@ -17,7 +17,7 @@ public class LoginInformationRequest {
     @Email(message = "Please provide a valid email address")
     private String emailAddress;
     @NotNull(message = "Password cannot be blank")
-    @Size(min = 6, max = 12)
+    @Size(min = 6, max = 50)
     @Basic(optional = false)
     private String password;
     @NotNull(message = "User role cannot be blank")

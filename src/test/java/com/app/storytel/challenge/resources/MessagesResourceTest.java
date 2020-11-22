@@ -6,7 +6,6 @@
 package com.app.storytel.challenge.resources;
 
 import com.app.storytel.challenge.auth.JwtTokenProvider;
-import com.app.storytel.challenge.model.Message;
 import com.app.storytel.challenge.payload.request.MessageRequest;
 import com.app.storytel.challenge.payload.response.JwtAuthenticationResponse;
 import com.app.storytel.challenge.payload.response.MessageResponse;
@@ -31,6 +30,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
@@ -77,8 +77,8 @@ public class MessagesResourceTest {
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk()).andReturn();
 
-        ArrayList<Message> criteria = new ObjectMapper().reader()
-                .forType(new TypeReference<ArrayList<Message>>() {})
+        ArrayList<MessageResponse> criteria = new ObjectMapper().reader()
+                .forType(new TypeReference<ArrayList<MessageResponse>>() {})
                 .readValue(result.getResponse().getContentAsString());
 
         assertTrue(criteria.size() > 1, "Record set greater than one");
@@ -96,8 +96,8 @@ public class MessagesResourceTest {
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk()).andReturn();
 
-        ArrayList<Message> messagesList = new ObjectMapper().reader()
-                .forType(new TypeReference<ArrayList<Message>>() {})
+        ArrayList<MessageResponse> messagesList = new ObjectMapper().reader()
+                .forType(new TypeReference<ArrayList<MessageResponse>>() {})
                 .readValue(result.getResponse().getContentAsString());
 
         assertAll(
@@ -113,8 +113,8 @@ public class MessagesResourceTest {
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk()).andReturn();
 
-        Message message = new ObjectMapper().reader()
-                .forType(new TypeReference<Message>() {})
+        MessageResponse message = new ObjectMapper().reader()
+                .forType(new TypeReference<MessageResponse>() {})
                 .readValue(result.getResponse().getContentAsString());
 
         assertEquals(2L, message.getId(), "Checked right record ID");
@@ -127,8 +127,8 @@ public class MessagesResourceTest {
 
         MvcResult result = mockMvc.perform(MockMvcRequestBuilders.post("/api/messages")
                 .header("Authorization", "Bearer " + this.accessToken)
-                .content(String.valueOf(messageRequest))
-                .contentType(MediaType.APPLICATION_JSON))
+                .content(new ObjectMapper().writer().withDefaultPrettyPrinter().writeValueAsString(messageRequest))
+                .contentType(MediaType.APPLICATION_JSON)).andDo(print())
                 .andExpect(status().isCreated()).andReturn();
 
         MessageResponse messageResponse = new ObjectMapper().reader()
@@ -149,8 +149,9 @@ public class MessagesResourceTest {
 
         MvcResult result = mockMvc.perform(MockMvcRequestBuilders.put("/api/messages")
                 .header("Authorization", "Bearer " + this.accessToken)
-                .content(String.valueOf(messageRequest))
+                .content(new ObjectMapper().writer().withDefaultPrettyPrinter().writeValueAsString(messageRequest))
                 .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
                 .andExpect(status().isOk()).andReturn();
 
         MessageResponse messageResponse = new ObjectMapper().reader()
@@ -174,24 +175,24 @@ public class MessagesResourceTest {
                 .header("Authorization", "Bearer " + this.accessToken)
                 .content(String.valueOf(messageRequest))
                 .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest()).andReturn();
+                .andExpect(status().isBadRequest());
     }
 
     @Test
     void testDeleteMessage() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/messages/1")
+        mockMvc.perform(MockMvcRequestBuilders.delete("/api/messages/1")
                 .header("Authorization", "Bearer " + this.accessToken)
                 .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNoContent()).andReturn();
+                .andExpect(status().isNoContent());
 
     }
 
     @Test
     void testDifferentOwnerDeleteMessage() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/messages/4")
+        mockMvc.perform(MockMvcRequestBuilders.delete("/api/messages/4")
                 .header("Authorization", "Bearer " + this.accessToken)
                 .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest()).andReturn();
+                .andExpect(status().isBadRequest());
 
     }
 
