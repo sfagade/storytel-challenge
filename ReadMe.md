@@ -1,4 +1,5 @@
 Project Name: com.app.storytel.challenge
+JDK Version: 11
 
 Description: This project serves RESTful API endpoints for a public message box, 
 it provides CRUD functionalities for messages in the software.
