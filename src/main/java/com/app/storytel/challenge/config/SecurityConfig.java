@@ -6,6 +6,7 @@ import com.app.storytel.challenge.auth.JwtAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.BeanIds;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -78,8 +79,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()
-                .antMatchers("/api/authentication/**", "/h2-console/**", "/api/public/**")
+                .antMatchers("/api/authentication/**", "/h2-console/**")
                 .permitAll()
+                .antMatchers(HttpMethod.GET, "/api/messages/**").permitAll()
                 .anyRequest()
                 .authenticated();
 
