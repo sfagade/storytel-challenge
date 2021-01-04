@@ -18,7 +18,7 @@ pipeline {
             }
         }
 
-        stage("test") {
+        stage("deploy") {
             steps {
                 withMaven(maven: 'Default_Maven') {
                      sh 'mvn deploy'
